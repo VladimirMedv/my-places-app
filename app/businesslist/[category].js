@@ -1,4 +1,10 @@
-import { View, Text, FlatList } from "react-native";
+import {
+  View,
+  Text,
+  FlatList,
+  ActivityIndicator,
+  StyleSheet,
+} from "react-native";
 import React, { useEffect, useState } from "react";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import { collection, getDocs, limit, query, where } from "firebase/firestore";
@@ -9,7 +15,8 @@ import { Colors } from "../../constants/Colors";
 export default function BusinessListByCategory() {
   const navigation = useNavigation();
   const { category } = useLocalSearchParams();
-  const [BusinessList, setBusinessList] = useState([]);
+  const [businessList, setBusinessList] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     navigation.setOptions({
@@ -20,9 +27,10 @@ export default function BusinessListByCategory() {
   }, []);
 
   const getBusinessList = async () => {
+    setLoading(true);
     const q = query(
       collection(db, "business_list"),
-      where("category", "==", category.toLocaleLowerCase()),
+      where("category", "==", category.toLowerCase()),
       limit(10)
     );
     const querySnapshot = await getDocs(q);
@@ -31,30 +39,51 @@ export default function BusinessListByCategory() {
       data.push(doc.data());
     });
     setBusinessList(data);
+    setLoading(false);
   };
 
   return (
-    <View>
-      {BusinessList?.length > 0 ? (
+    <View style={styles.container}>
+      {loading ? (
+        <ActivityIndicator
+          size="large"
+          color={Colors.PRIMARY}
+          style={styles.centered}
+        />
+      ) : businessList.length > 0 ? (
         <FlatList
-          data={BusinessList}
+          data={businessList}
+          onRefresh={getBusinessList}
+          refreshing={loading}
           renderItem={({ item, index }) => (
             <BusinessListCard business={item} key={index} />
           )}
         />
       ) : (
-        <Text
-          style={{
-            textAlign: "center",
-            fontSize: 18,
-            fontFamily: "nunito-bold",
-            color: Colors.GRAY,
-            marginTop: 30,
-          }}
-        >
-          No Buisness Found
-        </Text>
+        <Text style={styles.noBusinessText}>No Business Found</Text>
       )}
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  centered: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "column",
+  },
+  noBusinessText: {
+    textAlign: "center",
+    fontSize: 18,
+    fontFamily: "nunito-bold",
+    color: Colors.GRAY,
+    position: "absolute",
+    top: "50%",
+    left: "40%",
+    transform: [{ translateX: -40 }, { translateY: -50 }],
+  },
+});
