@@ -36,7 +36,7 @@ export default function BusinessListByCategory() {
     const querySnapshot = await getDocs(q);
     const data = [];
     querySnapshot.forEach((doc) => {
-      data.push(doc.data());
+      data.push({ ...doc.data(), id: doc.id });
     });
     setBusinessList(data);
     setLoading(false);
