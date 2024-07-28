@@ -1,19 +1,19 @@
 import { View, Text, FlatList } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Colors } from "../../constants/Colors";
-import { collection, getDocs, query } from "firebase/firestore";
+import { collection, getDocs, limit, query } from "firebase/firestore";
 import { db } from "../../configs/FirebaseConfig";
-import CategoryItem from "./CategoryItem";
+import PopularPlacesCard from "./PopularPlacesCard";
 
-export default function Category() {
-  const [categoryList, setCategoryList] = useState([]);
+export default function PopularPlaces() {
+  const [businessList, setBusinessList] = useState([]);
 
   useEffect(() => {
-    GetCategoryList();
+    getBusinessList();
   }, []);
 
-  const GetCategoryList = async () => {
-    const q = query(collection(db, "category"));
+  const getBusinessList = async () => {
+    const q = query(collection(db, "business_list"), limit(10));
     const querySnapshot = await getDocs(q);
 
     const data = [];
@@ -21,9 +21,7 @@ export default function Category() {
       data.push(doc.data());
     });
 
-    data.sort((a, b) => a.id - b.id);
-
-    setCategoryList(data);
+    setBusinessList(data);
   };
 
   return (
@@ -31,6 +29,8 @@ export default function Category() {
       <View
         style={{
           padding: 20,
+          marginTop: 10,
+          marginBottom: 5,
           flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "center",
@@ -42,23 +42,18 @@ export default function Category() {
             fontFamily: "nunito-bold",
           }}
         >
-          Category
+          Popular Places
         </Text>
         <Text style={{ color: Colors.PRIMARY, fontFamily: "nunito-medium" }}>
           View All
         </Text>
       </View>
       <FlatList
-        data={categoryList}
+        data={businessList}
         horizontal
         showsHorizontalScrollIndicator={false}
-        style={{ marginLeft: 5, marginTop: 5 }}
         renderItem={({ item, index }) => (
-          <CategoryItem
-            category={item}
-            key={index}
-            onCategoryPress={() => console.log(item)}
-          />
+          <PopularPlacesCard business={item} key={index} />
         )}
       />
     </View>

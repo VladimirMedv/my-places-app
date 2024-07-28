@@ -38,7 +38,7 @@ export default function Slider() {
 
       <FlatList
         data={sliderList}
-        horizontal={true}
+        horizontal
         showsHorizontalScrollIndicator={false}
         style={{ paddingLeft: 20 }}
         renderItem={({ item, index }) => (
