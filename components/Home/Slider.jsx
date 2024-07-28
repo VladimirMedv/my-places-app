@@ -11,13 +11,15 @@ export default function Slider() {
   }, []);
 
   const GetSliderList = async () => {
-    setSliderList([]);
     const q = query(collection(db, "slider"));
     const querySnapshot = await getDocs(q);
 
+    const data = [];
     querySnapshot.forEach((doc) => {
-      setSliderList((prev) => [...prev, doc.data()]);
+      data.push(doc.data());
     });
+
+    setSliderList(data);
   };
 
   return (

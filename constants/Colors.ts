@@ -26,4 +26,5 @@ export const Colors = {
 
   PRIMARY: "#8B00FF",
   GRAY: "#8f8f8f",
+  ICON_BG: "#8B00FF10",
 };
