@@ -29,7 +29,7 @@ export default function Category() {
   };
 
   return (
-    <View>
+    <View style={{ flex: 1 }}>
       <View
         style={{
           padding: 20,
